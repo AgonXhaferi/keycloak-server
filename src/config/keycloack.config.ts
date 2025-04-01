@@ -1,10 +1,24 @@
-import KeycloakConnect from 'keycloak-connect';
+import { Injectable } from '@nestjs/common';
+import {
+  KeycloakConnectOptions,
+  KeycloakConnectOptionsFactory,
+  PolicyEnforcementMode,
+  TokenValidation,
+} from 'nest-keycloak-connect';
+import { ConfigService } from '@nestjs/config';
 
-export const keycloakConfig: KeycloakConnect.KeycloakConfig = {
-  realm: 'singularis',
-  'auth-server-url': 'http://localhost:8080',
-  'ssl-required': 'none', // Use 'none' for development, 'external' for production
-  resource: 'singularis', // Client ID from Keycloak
-  'confidential-port': 0, // Default confidential port
-  'bearer-only': false,
-};
+@Injectable()
+export class KeycloakConfigService implements KeycloakConnectOptionsFactory {
+  constructor(private readonly configService: ConfigService) {}
+
+  createKeycloakConnectOptions(): KeycloakConnectOptions {
+    return {
+      authServerUrl: this.configService.get<string>('KEYCLOAK_AUTH_SERVER_URL'),
+      realm: this.configService.getOrThrow<string>('KEYCLOAK_REALM'),
+      clientId: this.configService.getOrThrow<string>('KEYCLOAK_CLIENT_ID'),
+      secret: this.configService.getOrThrow<string>('KEYCLOAK_CLIENT_ID'),
+      policyEnforcement: PolicyEnforcementMode.PERMISSIVE,
+      tokenValidation: TokenValidation.ONLINE,
+    };
+  }
+}

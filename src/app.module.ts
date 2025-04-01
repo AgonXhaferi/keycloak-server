@@ -9,10 +9,12 @@ import {
   TokenValidation,
 } from 'nest-keycloak-connect';
 import { AuthService } from './auth/auth.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     HttpModule,
+    ConfigModule.forRoot(),
     KeycloakConnectModule.register({
       authServerUrl: 'http://localhost:8080',
       realm: 'singularis',
