@@ -3,6 +3,7 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { RegisterUserRequest } from '../request/register-user.request';
 import { v4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
+import { RequiredActionAlias } from '@keycloak/keycloak-admin-client/lib/defs/requiredActionProviderRepresentation';
 
 @Injectable()
 export class KeycloakService implements OnModuleInit {
@@ -48,5 +49,15 @@ export class KeycloakService implements OnModuleInit {
     });
 
     return userId;
+  }
+
+  async resetPassword(registerUserRequest: RegisterUserRequest) {
+    await this.keycloakClient.users.executeActionsEmail({
+      id: 'userID',
+      realm: 'singularis',
+      actions: [RequiredActionAlias.UPDATE_PASSWORD],
+      clientId: 'your-client-id',
+      redirectUri: 'http://your-frontend.com/reset-success',
+    });
   }
 }
